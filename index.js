@@ -1,5 +1,4 @@
 "use strict";
-
 class LoadResource {
     constructor(fileUrl) {
         this.fileUrl = fileUrl;
@@ -16,7 +15,48 @@ class LoadResource {
     }
 }
 
+function mapData(data) {
+    const result = [];
+
+    for (let key in data) {
+        const item = {
+            name: key,
+            value: data[key],
+            tag: elementsTags[key] || elementsTags.default
+        }
+    
+        result.push(item);
+    }
+
+    return result;
+}
+
+function buildDom(squadProperties) {
+    const fragment = document.createDocumentFragment();
+
+    squadProperties.forEach(function(item){
+        const node = document.createElement(item.tag);
+        node.innerText = item.value;
+        fragment.appendChild(node);
+    });
+    
+    return fragment;
+}
+
+const elementsTags = {
+    default: 'div',
+    squadName: 'h1',
+    secretBase: 'i'
+};
+
 const fileUrl = "https://raw.githubusercontent.com/mdn/learning-area/master/javascript/oojs/json/superheroes.json";
 const xhr = new LoadResource(fileUrl);
-const data = xhr.responseData();
-console.log(data);
+const responseData = xhr.responseData();
+const root = document.getElementById('root');
+
+delete responseData.active;
+delete responseData.members;
+
+const data = mapData(responseData);
+const segment = buildDom(data);
+root.append(segment);
